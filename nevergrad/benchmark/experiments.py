@@ -24,7 +24,7 @@ def basic(seed: Optional[int] = None) -> Iterator[Experiment]:
     function = ArtificialFunction(name="sphere", block_dimension=2, noise_level=1)
     np.random.seed(seed)  # seed before initializing the function!
     function.initialize()  # initialization uses randomness
-    return iter([Experiment(function, optimizer_name="OnePlusOne", num_workers=2, budget=4, seed=next(seedg))])
+    return (Experiment(function, optimizer_name=e, num_workers=2, budget=4, seed=next(seedg)) for e in "OnePlusOne SPSA".split())
 
 
 @registry.register
@@ -91,7 +91,7 @@ def illcond(seed: Optional[int] = None) -> Iterator[Experiment]:
     """
     seedg = create_seed_generator(seed)
     for budget in [500, 1000, 2000, 4000]:
-        for optim in ["SQP", "DE", "CMA", "PSO", "RotationInvariantDE", "NelderMead"]:
+        for optim in ["SQP", "DE", "CMA", "PSO", "RotationInvariantDE", "NelderMead", "SPSA"]:
             for rotation in [True, False]:
                 for name in ["ellipsoid", "cigar"]:
                     function = ArtificialFunction(name=name, rotation=rotation, block_dimension=100)
@@ -105,7 +105,7 @@ def compabasedillcond(seed: Optional[int] = None) -> Iterator[Experiment]:
     seedg = create_seed_generator(seed)
     for budget in [500, 1000, 2000, 4000, 8000]:
         for optim in ["DE", "CMA", "PSO", "BPRotationInvariantDE", "RotationInvariantDE",
-                      "AlmostRotationInvariantDE", "AlmostRotationInvariantDEAndBigPop"]:
+                      "AlmostRotationInvariantDE", "AlmostRotationInvariantDEAndBigPop", "SPSA"]:
             for rotation in [True, False]:
                 for name in ["ellipsoid", "cigar"]:
                     function = ArtificialFunction(name=name, rotation=rotation, block_dimension=30)
@@ -118,7 +118,7 @@ def noise(seed: Optional[int] = None) -> Iterator[Experiment]:
     """
     seedg = create_seed_generator(seed)
     optims = sorted(x for x, y in optimization.registry.items()
-                    if ("TBPSA" in x or "ois" in x or "CMA" in x or "epea" in x) and "iscr" not in x)
+                    if ("SPSA" in x or "TBPSA" in x or "ois" in x or "CMA" in x or "epea" in x) and "iscr" not in x)
     for budget in [500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000 ]:
         for optim in optims:
             for rotation in [True, False]:
